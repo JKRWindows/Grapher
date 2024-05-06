@@ -1,7 +1,7 @@
 # Getting Started
 Add this repo as a submodule with:
 ```bash
-git add submodule https://github.com/JKRWindows/Grapher
+git submodule add https://github.com/JKRWindows/Grapher
 ```
 
 Then the object can be initialized started with:
