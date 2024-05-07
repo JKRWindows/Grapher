@@ -23,6 +23,7 @@ class Dot(Writable):
     
     def __enter__(self):
         self._pipe = subprocess.Popen(['dot', f'-T{self.format}', '-o', f'{self.outfile}.{self.format}'], stdin=subprocess.PIPE)
+        return self
     
     def __exit__(self, *_):
         if self._pipe is None:
