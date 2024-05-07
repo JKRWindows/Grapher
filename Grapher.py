@@ -13,16 +13,19 @@ class Writable(Protocol):
         ...
 
 class Dot(Writable):
-    def __init__(self, outfile: str, format: str):
+    def __init__(self, outfile: str, format: str, write_to_file: bool = False):
         '''
         outfile is just the file name without the extension. The extension is added in the `format` argument.
         '''
         self.format = format
         self.outfile = outfile
+        self.write_to_file = write_to_file
         self._pipe: Optional[subprocess.Popen[bytes]] = None
     
     def __enter__(self):
         self._pipe = subprocess.Popen(['dot', f'-T{self.format}', '-o', f'{self.outfile}.{self.format}'], stdin=subprocess.PIPE)
+        if self.write_to_file:
+            self.file = open(f'{self.outfile}.dot', 'wb')
         return self
     
     def __exit__(self, *_):
@@ -31,6 +34,9 @@ class Dot(Writable):
         
         if self._pipe.stdin is None:
             raise Exception('stdin shouldn\'t ever be None')
+
+        if self.write_to_file:
+            self.file.close()
         self._pipe.stdin.close()
     
     def write(self, s: str, /) -> int:
@@ -40,6 +46,8 @@ class Dot(Writable):
         if self._pipe.stdin is None:
             raise Exception('stdin shouldn\'t ever be None')
         
+        if self.write_to_file:
+            return self.file.write(s.encode())
         return self._pipe.stdin.write(s.encode())
     
     def writelines(self, lines: Iterable[str], /) -> None:
@@ -49,6 +57,8 @@ class Dot(Writable):
         if self._pipe.stdin is None:
             raise Exception('stdin shouldn\'t ever be None')
         
+        if self.write_to_file:
+            self.file.writelines(map(lambda x: x.encode(), lines))
         self._pipe.stdin.writelines(map(lambda x: x.encode(), lines))
 
 
