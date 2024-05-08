@@ -47,7 +47,7 @@ class Dot(Writable):
             raise Exception('stdin shouldn\'t ever be None')
         
         if self.write_to_file:
-            return self.file.write(s.encode())
+            self.file.write(s.encode())
         return self._pipe.stdin.write(s.encode())
     
     def writelines(self, lines: Iterable[str], /) -> None:
